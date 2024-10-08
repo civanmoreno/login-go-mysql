@@ -13,15 +13,6 @@ import (
 )
 
 func main() {
-
-	/*
-		pass := "123456"
-		hash, err := utilities.HashPassword(pass)
-		if err != nil {
-			log.Fatal("Error hashing password: ", err)
-		}
-		println(hash)
-	*/
 	db, err := utilities.ConnectToDB()
 	if err != nil {
 		log.Fatal("Failed to connect to database: ", err)
@@ -35,7 +26,9 @@ func main() {
 	userHandler := userHttp.NewUserHandler(userService)
 
 	route.HandleFunc("/user/login", userHandler.Login).Methods("POST")
-	route.Handle("/user/create", auth.AuthMiddleware(http.HandlerFunc(userHandler.CreateUser))).Methods("POST")
+	route.HandleFunc("/user/resset_password", userHandler.RessetPassword).Methods("POST")
+	route.HandleFunc("/user/create", userHandler.CreateUser).Methods("POST")
+
 	route.Handle("/auth/validation", auth.AuthMiddleware(http.HandlerFunc(auth.ValidateTokenHandler))).Methods("POST")
 
 	http.ListenAndServe(":8080", route)

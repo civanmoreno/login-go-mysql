@@ -80,3 +80,28 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(userJSON)
 }
+
+func (h *UserHandler) RessetPassword(w http.ResponseWriter, r *http.Request) {
+	var user struct {
+		Email string `json:"email"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, "Error parsing request body", http.StatusBadRequest)
+		return
+	}
+
+	if user.Email == "" {
+		http.Error(w, "Missing email", http.StatusBadRequest)
+		return
+	}
+
+	err = h.Service.RessetPassword(user.Email)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

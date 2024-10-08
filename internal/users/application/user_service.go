@@ -37,3 +37,24 @@ func (u *UserService) Login(username, password string) (domain.User, string, err
 	}
 	return user, token, nil
 }
+
+func (u *UserService) RessetPassword(email string) error {
+	user, err := u.userRepository.GetUserByEmail(email)
+	if err != nil {
+		return errors.New("user no found")
+	}
+
+	pass, err := utilities.GenerateRandomPassword(12)
+	if err != nil {
+		return errors.New("error generando contraseña")
+	}
+
+	err = u.userRepository.UpdatePassword(user.Email, pass)
+	if err != nil {
+		return errors.New("error actualizando la contraseña")
+	}
+
+	go utilities.SendMail(user.Email, "Password reset", pass)
+
+	return nil
+}

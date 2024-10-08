@@ -5,6 +5,7 @@ import (
 	"errors"
 	"main/internal/users/domain"
 	"main/internal/users/ports"
+	"main/utilities"
 )
 
 type MySQLUserRepository struct {
@@ -32,4 +33,28 @@ func (r *MySQLUserRepository) GetUserByUsername(username string) (domain.User, e
 	}
 
 	return user, nil
+}
+
+func (r *MySQLUserRepository) GetUserByEmail(email string) (domain.User, error) {
+	var user domain.User
+
+	err := r.db.QueryRow("SELECT id, username, email, password, role FROM users WHERE email = ?", email).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Role)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return user, errors.New("user no found")
+		}
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (r *MySQLUserRepository) UpdatePassword(email, password string) error {
+	hashedPassword, err := utilities.HashPassword(password)
+	if err != nil {
+		return err
+	}
+	_, err = r.db.Exec("UPDATE users SET password = ? WHERE email = ?", hashedPassword, email)
+	return err
 }
