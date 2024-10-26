@@ -10,6 +10,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -30,6 +31,12 @@ func main() {
 	route.HandleFunc("/user/create", userHandler.CreateUser).Methods("POST")
 
 	route.Handle("/auth/validation", auth.AuthMiddleware(http.HandlerFunc(auth.ValidateTokenHandler))).Methods("POST")
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:5173"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedHeaders: []string{"Content-Type", "Authorization"},
+	})
+	routes := c.Handler(route)
+	http.ListenAndServe(":8080", routes)
 
-	http.ListenAndServe(":8080", route)
 }

@@ -22,8 +22,8 @@ func (u *UserService) CreateUser(user domain.User) error {
 	return u.userRepository.CreateUser(user)
 }
 
-func (u *UserService) Login(username, password string) (domain.User, string, error) {
-	user, err := u.userRepository.GetUserByUsername(username)
+func (u *UserService) Login(email, password string) (domain.User, string, error) {
+	user, err := u.userRepository.GetUserByEmail(email)
 	if err != nil {
 		return user, "", err
 	}

@@ -48,7 +48,7 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var creds struct {
-		Username string `json:"username"`
+		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 	var userJSON struct {
@@ -62,11 +62,11 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error parsing request body", http.StatusBadRequest)
 		return
 	}
-	if creds.Username == "" || creds.Password == "" {
-		http.Error(w, "Missing username or password", http.StatusBadRequest)
+	if creds.Email == "" || creds.Password == "" {
+		http.Error(w, "Missing email or password", http.StatusBadRequest)
 		return
 	}
-	user, token, err := h.Service.Login(creds.Username, creds.Password)
+	user, token, err := h.Service.Login(creds.Email, creds.Password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return

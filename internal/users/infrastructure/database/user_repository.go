@@ -42,7 +42,7 @@ func (r *MySQLUserRepository) GetUserByEmail(email string) (domain.User, error) 
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return user, errors.New("user no found")
+			return user, errors.New("usuario no encontrado")
 		}
 		return user, err
 	}
